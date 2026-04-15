@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGE WITH ANDRE | CARDS EDITION</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600;900&display=swap');
+
+        :root {
+            --accent: #bc13fe;
+            --blue: #00f2ff;
+            --green: #00ff88;
+            --red: #ff3c3c;
+            --bg: #0b021a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(188, 19, 254, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 50%);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ПЕРВОНАЧАЛЬНЫЙ ЭКРАН */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #start-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-100%);
+        }
+
+        .welcome-title {
+            font-size: clamp(2rem, 8vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: 15px;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, #fff, var(--accent), var(--blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            animation: emerge 1.2s ease forwards 0.3s;
+        }
+
+        .start-btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            background: transparent;
+            border: 2px solid var(--accent);
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.4s;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 1s;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+        }
+
+        .start-btn:hover {
+            background: var(--accent);
+            box-shadow: 0 0 40px var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* КОНТЕЙНЕР ЗАДАНИЙ */
+        .app-container {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            padding: 60px 20px;
+            opacity: 0;
+        }
+
+        header h1 {
+            font-size: 3.5rem;
+            letter-spacing: 12px;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(90deg, #fff, var(--blue), #fff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        /* МЕХАНИКА КАРТОЧЕК */
+        .card-scene {
+            width: 100%;
+            perspective: 1200px;
+            margin-bottom: 30px;
+        }
+
+        .card-inner {
+            width: 100%;
+            position: relative;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            min-height: 350px;
+        }
+
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 30px;
+            padding: 40px;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-front {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+        }
+
+        .card-back {
+            background: rgba(15, 5, 30, 0.95);
+            transform: rotateY(180deg);
+            border-width: 2px;
+        }
+
+        .card-back.win { border-color: var(--green); }
+        .card-back.fail { border-color: var(--red); }
+
+        .tag {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--blue);
+            padding: 6px 15px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            align-self: flex-start;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .q-text {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        .check-btn {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 0 30px;
+            border-radius: 15px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .check-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+        /* ОБОРОТНАЯ СТОРОНА */
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .res-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .correct-answer {
+            color: #fff;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .explanation {
+            font-size: 0.95rem;
+            color: #ccc;
+            line-height: 1.6;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+        @keyframes emerge { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        @media (max-width: 600px) {
+            .input-group { flex-direction: column; }
+            .card-inner { min-height: 450px; }
+            header h1 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <div class="welcome-title">OGE WITH ANDRE</div>
+    <button class="start-btn" onclick="init()">Начать решать задания</button>
+</div>
+
+<div class="app-container" id="app">
+    <header><h1>ЗАДАНИЯ</h1></header>
+    <div id="cards-list"></div>
+</div>
+
+<script>
+    const data = [
+        { id: 16, tag: "Карточка №16", q: "Какой город России является самым населённым (без учёта Москвы)?", a: ["санкт-петербург", "питер", "спб"], r: "Санкт-Петербург (около 5,6 млн человек)", e: "Пояснение: Москва — более 13 млн, Санкт-Петербург — второй." },{ id: 17, tag: "Карточка №17", q: "Что такое урбанизация? Назовите регион России с самым высоким уровнем урбанизации.", a: ["мурманская"], r: "Рост городов и населения. Мурманская область (92%)", e: "Пояснение: это связано с промышленным освоением Севера." },
+        { id: 18, tag: "Карточка №18", q: "В каком субъекте РФ самая низкая плотность населения?", a: ["чукотский", "чукотка"], r: "Чукотский АО (менее 0,1 чел/км²)", e: "Пояснение: суровый климат, удалённость. В Московской обл. для сравнения — 160 чел/км²." },
+        { id: 19, tag: "Карточка №19", q: "Какая отрасль является ведущей в топливной промышленности России?", a: ["нефтяная", "газовая"], r: "Нефтяная и газовая", e: "Пояснение: Россия — один из крупнейших экспортёров нефти и газа в мире." },
+        { id: 20, tag: "Карточка №20", q: "Какой город называют «угольной столицей» России?", a: ["новокузнецк"], r: "Новокузнецк (Кузбасс)", e: "Пояснение: Кузнецкий угольный бассейн — крупнейший в стране." },
+        { id: 21, tag: "Карточка №21", q: "Установите соответствие: 1) Тольятти, 2) Н. Новгород, 3) Калуга. Варианты: А) ГАЗ, Б) АвтоВАЗ, В) Volkswagen.", a: ["1б 2а 3в", "бав"], r: "1–Б, 2–А, 3–В", e: "Пояснение: Тольятти — АвтоВАЗ, Нижний — ГАЗ, Калуга — иномарки." },
+        { id: 22, tag: "Карточка №22", q: "В каком регионе России развито алюминиевое производство и почему?", a: ["сибирь", "красноярский"], r: "В Восточной Сибири из-за дешёвой энергии ГЭС", e: "Пояснение: выплавка алюминия очень энергоёмкая." },
+        { id: 23, tag: "Карточка №23", q: "Какие три города являются центрами чёрной металлургии полного цикла?", a: ["магнитогорск", "череповец", "новокузнецк"], r: "Магнитогорск, Череповец, Новокузнецк", e: "Пояснение: есть свои месторождения руды или угля, работают доменные печи." },
+        { id: 24, tag: "Карточка №24", q: "Почему в Поволжье развито машиностроение и нефтепереработка?", a: ["транспорт", "волга"], r: "Выгодное положение (Волга) и наличие нефти", e: "Пояснение: типичный пример задания на причинно-следственные связи." },
+        { id: 25, tag: "Карточка №25", q: "Назовите три субъекта РФ, где выращивают рис.", a: ["краснодарский", "ростовская", "астраханская"], r: "Краснодарский, Ростовская, Астраханская", e: "Пояснение: рис требует жары и воды. Кубань — лидер." },
+        { id: 26, tag: "Карточка №26", q: "Какая крайняя северная точка России?", a: ["флигели"], r: "Мыс Флигели (Земля Франца-Иосифа)", e: "Пояснение: Мыс Челюскин — материковая, а Флигели — островная." },
+        { id: 27, tag: "Карточка №27", q: "Какая река впадает в Каспийское море?", a: ["волга"], r: "Волга", e: "Пояснение: Крупнейшая река Европы впадает в Каспийское озеро-море." },
+        { id: 28, tag: "Карточка №28", q: "Субъект: Республика в Европе, столица древняя, ГЭС на Волге, язык тюркский.", a: ["татарстан"], r: "Республика Татарстан (Казань)", e: "Пояснение: Волга + тюркский язык + древняя столица." },
+        { id: 29, tag: "Карточка №29", q: "Назовите три города-миллионера на Волге.", a: ["казань", "самара", "волгоград", "нижний"], r: "Нижний Новгород, Казань, Самара, Волгоград", e: "Всего на Волге их четыре." },
+        { id: 30, tag: "Карточка №30", q: "Какие три города — центры АЭС: Смоленск, Курск, Тверь, Воронеж, Балаково?", a: ["курск", "смоленск", "балаково"], r: "Курск, Смоленск, Балаково", e: "Балаково — крупнейшая АЭС в Саратовской области." }
+    ];
+
+    function init() {
+        document.getElementById('start-screen').classList.add('hidden');
+        const app = document.getElementById('app');
+        app.style.display = 'block';
+        setTimeout(() => app.style.opacity = '1', 50);
+        render();
+    }
+
+    function render() {
+        const container = document.getElementById('cards-list');
+        data.forEach(item => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'card-scene';
+            wrapper.innerHTML = `
+                <div class="card-inner" id="inner-${item.id}"><div class="card-front">
+                        <div class="tag">${item.tag}</div>
+                        <div class="q-text">${item.q}</div>
+                        <div class="input-group">
+                            <input type="text" placeholder="Твой ответ..." id="in-${item.id}">
+                            <button class="check-btn" onclick="flip(${item.id})">ОТВЕТИТЬ</button>
+                        </div>
+                    </div>
+                    <div class="card-back" id="back-${item.id}">
+                        <div class="status-icon" id="icon-${item.id}"></div>
+                        <div class="res-title" id="title-${item.id}"></div>
+                        <div class="correct-answer"><b>Верно:</b> ${item.r}</div>
+                        <div class="explanation">${item.e}</div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(wrapper);
+        });
+    }
+
+    window.flip = (id) => {
+        const input = document.getElementById(`in-${id}`).value.toLowerCase().trim();
+        const inner = document.getElementById(`inner-${id}`);
+        const back = document.getElementById(`back-${id}`);
+        const icon = document.getElementById(`icon-${id}`);
+        const title = document.getElementById(`title-${id}`);
+        const item = data.find(x => x.id === id);
+
+        const isCorrect = item.a.some(ans => input.includes(ans)) && input !== "";
+
+        if(isCorrect) {
+            back.className = 'card-back win';
+            icon.innerHTML = '❤️';
+            title.innerHTML = 'Верно!';
+        } else {
+            back.className = 'card-back fail';
+            icon.innerHTML = '💔';
+            title.innerHTML = 'Ошибка';
+        }
+
+        inner.classList.add('is-flipped');
+    }
+</script>
+</body>
+</html>
