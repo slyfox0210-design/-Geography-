@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGE WITH ANDRE</title>
+    <style>
+        :root { --red: #ff3333; --bg: #0a0a0a; --card: #151515; --border: #333; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        header { width: 100%; max-width: 800px; text-align: center; padding: 40px 0; border-bottom: 2px solid var(--red); margin-bottom: 40px; }
+        header h1 { font-size: 3rem; letter-spacing: 5px; text-shadow: 0 0 15px var(--red); margin: 0; }
+        .container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 25px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 25px; transition: 0.4s; position: relative; animation: slideIn 0.5s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .q-text { font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; display: block; }
+        .input-group { display: flex; gap: 10px; margin-top: 15px; }
+        input { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px 15px; border-radius: 6px; flex: 1; outline: none; }
+        input:focus { border-color: var(--red); }
+        button { background: var(--red); color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 8px; display: none; line-height: 1.5; }
+        .correct { border-left: 5px solid #00ff00; background: rgba(0, 255, 0, 0.05); }
+        .wrong { border-left: 5px solid var(--red); background: rgba(255, 0, 0, 0.05); }
+        .poyasnenie { display: block; margin-top: 8px; color: #aaa; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>OGE WITH ANDRE</h1>
+    <p>Подготовка к ОГЭ по географии v1.0</p>
+</header>
+
+<div class="container" id="quiz-container">
+    </div>
+
+<script>
+    // Массив данных - здесь твои 15 вопросов + 20 с ФИПИ
+    const data = [
+        { id: 16, q: "Самый населённый город России (без учёта Москвы)?", a: ["санкт-петербург", "питер", "спб"], p: "Санкт-Петербург (~5,6 млн). Москва — лидер." },
+        { id: 17, q: "Что такое урбанизация? Регион РФ с самым высоким уровнем?", a: ["мурманская"], p: "Рост городов. В Мурманской обл. — 92%." },
+        { id: 18, q: "В каком субъекте РФ самая низкая плотность населения?", a: ["чукотский", "чукотка"], p: "Чукотский АО (менее 0,1 чел/км²)." },
+        { id: 19, q: "Ведущая отрасль топливной промышленности России?", a: ["нефтяная", "газовая"], p: "Нефтегазовая отрасль — основа экспорта." },
+        { id: 20, q: "Город — «угольная столица» России?", a: ["новокузнецк"], p: "Новокузнецк (центр Кузбасса)." },
+        { id: 21, q: "Соответствие: 1-Тольятти, 2-Н.Новгород, 3-Калуга (ГАЗ, АвтоВАЗ, VW)", a: ["1б 2а 3в", "б а в"], p: "1-АвтоВАЗ, 2-ГАЗ, 3-VW." },
+        { id: 22, q: "Где развито алюминиевое производство и почему?", a: ["сибирь", "красноярский"], p: "Восточная Сибирь (дешевая энергия ГЭС)." },
+        { id: 23, q: "Три города — центра чёрной металлургии полного цикла?", a: ["магнитогорск", "череповец", "новокузнецк"], p: "Магнитогорск, Череповец, Новокузнецк." },
+        { id: 24, q: "Почему в Поволжье развито машиностроение?", a: ["транспорт", "волга", "нефть"], p: "Выгодное положение на Волге и ресурсы." },
+        { id: 25, q: "Три субъекта РФ, где выращивают рис?", a: ["краснодарский", "ростовская", "астраханская"], p: "Кубань — главный регион." },
+        { id: 26, q: "Крайняя северная точка России?", a: ["флигели"], p: "Мыс Флигели (остров). Материк — Челюскин." },
+        { id: 27, q: "Река, впадающая в Каспийское море?", a: ["волга"], p: "Волга — крупнейшая река Европы." },{ id: 28, q: "Субъект: ПФО, столица Казань, тюрки?", a: ["татарстан"], p: "Это Республика Татарстан." },
+        { id: 29, q: "Три города-миллионера на Волге?", a: ["казань", "самара", "волгоград", "нижний"], p: "Н.Новгород, Казань, Самара, Волгоград." },
+        { id: 30, q: "Центры АЭС: Смоленск, Курск, Тверь, Воронеж, Балаково (выбрать 3)?", a: ["курск", "смоленск", "балаково"], p: "Курск, Смоленск, Балаково — запомни для ОГЭ." },
+        { id: 31, q: "Океан, в котором находится Сахалин?", a: ["тихий"], p: "Тихий океан." },
+        { id: 32, q: "Самое глубокое озеро мира?", a: ["байкал"], p: "Байкал (1642 м)." },
+        { id: 33, q: "Самая длинная сухопутная граница РФ?", a: ["казахстан"], p: "Граница с Казахстаном (>7500 км)." },
+        { id: 34, q: "Самый высокий действующий вулкан Евразии?", a: ["ключевская"], p: "Ключевская Сопка на Камчатке." },
+        { id: 35, q: "Пролив между Тихим и Сев. Ледовитым океанами?", a: ["берингов"], p: "Берингов пролив." },
+        { id: 36, q: "Область с самой западной точкой страны?", a: ["калининградская"], p: "Балтийская коса." },
+        { id: 37, q: "Самый большой остров России?", a: ["сахалин"], p: "Остров Сахалин." },
+        { id: 38, q: "Природная зона с самой большой площадью в РФ?", a: ["тайга"], p: "Зона хвойных лесов." },
+        { id: 39, q: "Столица Якутии?", a: ["якутск"], p: "Якутск — полюс холода." },
+        { id: 40, q: "Самое мелкое море в мире?", a: ["азовское"], p: "Глубина до 13.5 м." },
+        { id: 41, q: "Основной климатический пояс России?", a: ["умеренный"], p: "Большая часть РФ в умеренном поясе." },
+        { id: 42, q: "Горы между Европой и Азией?", a: ["уральские", "урал"], p: "Уральские горы." },
+        { id: 43, q: "Город — 'порт пяти морей'?", a: ["москва"], p: "Благодаря каналам." },
+        { id: 44, q: "Регион — 'янтарный край'?", a: ["калининградская"], p: "Добыча янтаря." },
+        { id: 45, q: "Высшая точка России?", a: ["эльбрус"], p: "Гора Эльбрус (5642 м)." },
+        { id: 46, q: "Море, где остров Новая Земля?", a: ["баренцево", "карское"], p: "Граница этих морей." },
+        { id: 47, q: "Самая длинная река в России (с Иртышом)?", a: ["обь"], p: "Обь-Иртыш." },
+        { id: 48, q: "Центр судостроения на Балтике?", a: ["санкт-петербург"], p: "Питерские верфи." },
+        { id: 49, q: "Регион-лидер по добыче газа?", a: ["ямало-ненецкий", "ямал"], p: "ЯНАО." },
+        { id: 50, q: "Незамерзающий порт за Полярным кругом?", a: ["мурманск"], p: "Порт Мурманск (Гольфстрим)." }
+    ];
+
+    const container = document.getElementById('quiz-container');
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <span class="q-text">${item.id}. ${item.q}</span>
+            <div class="input-group">
+                <input type="text" placeholder="Ответ..." id="in-${item.id}">
+                <button onclick="check(${item.id})">OK</button>
+            </div>
+            <div class="feedback" id="f-${item.id}"></div>
+        `;
+        container.appendChild(card);
+    });
+
+    window.check = function(id) {
+        const val = document.getElementById('in-' + id).value.toLowerCase().trim();
+        const f = document.getElementById('f-' + id);
+        const q = data.find(x => x.id === id);
+        const ok = q.a.some(a => val.includes(a));
+        
+        f.style.display = 'block';
+        if(ok && val !== "") {
+            f.className = 'feedback correct';
+            f.innerHTML = '<b>ВЕРНО!</b><br><span class="poyasnenie">' + q.p + '</span>';
+        } else {
+            f.className = 'feedback wrong';
+            f.innerHTML = '<b>ОШИБКА.</b> Правильно: ' + q.a[0] + '<br><span class="poyasnenie">' + q.p + '</span>';
+        }
+    };
+</script>
+
+</body>
+</html>
