@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGE WITH ANDRE | ULTIMATE EDITION</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;600;900&display=swap');
+
+        :root {
+            --accent: #bc13fe;
+            --blue: #00f2ff;
+            --green: #00ff88;
+            --bg: #0b021a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(188, 19, 254, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 50%);
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* АНИМИРОВАННЫЙ СТАРТОВЫЙ ЭКРАН */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #start-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-100%);
+        }
+
+        .welcome-title {
+            font-size: clamp(2rem, 8vw, 4.5rem);
+            font-weight: 900;
+            letter-spacing: 15px;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, #fff, var(--accent), var(--blue));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: scale(0.9);
+            animation: emerge 1.2s ease forwards 0.3s;
+        }
+
+        .start-btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+            background: transparent;
+            border: 2px solid var(--accent);
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.4s;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 1s;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+        }
+
+        .start-btn:hover {
+            background: var(--accent);
+            box-shadow: 0 0 40px var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .container {
+            display: none;
+            width: 100%;
+            max-width: 900px;
+            padding: 60px 20px;
+            opacity: 0;
+        }
+
+        .container.active { display: block; animation: fadeIn 0.8s ease forwards; }
+
+        header h1 {
+            font-size: 3.5rem;
+            letter-spacing: 12px;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(90deg, #fff, var(--blue), #fff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            background: var(--glass);
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            color: #777;
+            font-weight: 900;cursor: pointer;
+            border-radius: 15px;
+            transition: 0.4s;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        .list-section { display: none; flex-direction: column; gap: 25px; }
+        .list-section.active { display: flex; }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            padding: 35px;
+            transition: 0.3s;
+        }
+
+        .card:hover { border-color: var(--blue); transform: translateY(-3px); }
+
+        .tag {
+            display: inline-block;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--blue);
+            padding: 6px 15px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .q-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 25px; color: #ddd; }
+
+        .input-box { display: flex; gap: 15px; }
+        input {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 2px solid var(--border);
+            padding: 18px;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        input:focus { border-color: var(--accent); }
+
+        .ok-btn {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 0 30px;
+            border-radius: 15px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+            font-size: 1rem;
+        }
+
+        .result.win { border: 2px solid var(--green); background: rgba(0, 255, 136, 0.05); color: var(--green); }
+        .result.fail { border: 2px solid #ff3c3c; background: rgba(255, 60, 60, 0.05); color: #ff3c3c; }
+
+        .expl { display: block; margin-top: 10px; color: #aaa; border-top: 1px solid var(--border); padding-top: 10px; }
+
+        @keyframes emerge { to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        .shake { animation: shake 0.4s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @media (max-width: 600px) {
+            .input-box { flex-direction: column; }
+            header h1 { font-size: 2.2rem; }
+            .tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="start-screen">
+    <div class="welcome-title">OGE WITH ANDRE</div>
+    <button class="start-btn" onclick="startApp()">Начать решать задания</button>
+</div>
+
+<div class="container" id="app">
+    <header><h1>ЗАДАНИЯ</h1></header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('c')">Классика (16-50)</button>
+        <button class="tab-btn" onclick="showTab('o')">Типы ОГЭ (Скрины)</button>
+    </div>
+
+    <div id="c-list" class="list-section active"></div>
+    <div id="o-list" class="list-section"></div>
+</div>
+
+<script>
+    const classicData = [
+        { id: 16, q: "Самый населённый город России после Москвы?", a: ["санкт-петербург", "питер", "спб"], p: "Санкт-Петербург — второй по населению город РФ." },
+        { id: 17, q: "Регион РФ с самым высоким уровнем урбанизации (~92%).", a: ["мурманская"], p: "Мурманская область." },
+        { id: 18, q: "Субъект РФ с самой низкой плотностью населения?", a: ["чукотский", "чукотка"], p: "Чукотский автономный округ." },{ id: 19, q: "Ведущая отрасль топливной промышленности России?", a: ["нефтяная", "газовая"], p: "Нефть и газ." },
+        { id: 20, q: "Какой город — «угольная столица» России?", a: ["новокузнецк"], p: "Новокузнецк (Кузбасс)." },
+        { id: 23, q: "Три центра чёрной металлургии полного цикла?", a: ["магнитогорск", "череповец", "новокузнецк"], p: "Магнитогорск, Череповец, Новокузнецк." },
+        { id: 27, q: "Крупнейшая река Европы, впадающая в Каспий?", a: ["волга"], p: "Река Волга." },
+        { id: 32, q: "Самое глубокое озеро мира?", a: ["байкал"], p: "Озеро Байкал." },
+        { id: 45, q: "Высшая точка России?", a: ["эльбрус"], p: "Гора Эльбрус." }
+    ];
+
+    const ogeData = [
+        { id: 1, t: "Задание 1", q: "Кто в 1492 г. открыл Америку?<br>1) Магеллан, 2) Колумб, 3) Васко да Гама, 4) Кук", a: ["2", "колумб"], p: "Христофор Колумб." },
+        { id: 2, t: "Задание 2", q: "С какой страной у РФ есть сухопутная граница?<br>1) Швеция, 2) Армения, 3) Туркмения, 4) Монголия", a: ["4", "монголия"], p: "Монголия — сухопутная граница." },
+        { id: 3, t: "Задание 3", q: "Расположите по УМЕНЬШЕНИЮ плодородия почв:<br>1) Тверская обл., 2) Воронежская обл., 3) Вологодская обл.", a: ["213"], p: "Воронеж > Тверь > Вологда." },
+        { id: 5, t: "Задание 5", q: "Город в зоне действия циклона (буква 'Н' на карте)?<br>1) Новосибирск, 2) Петрозаводск, 3) Омск, 4) Барнаул", a: ["2", "петрозаводск"], p: "Н — низкое давление (циклон)." },
+        { id: 6, t: "Задание 6", q: "В каком городе ожидается похолодание (треугольники на линии)?<br>1) Москва, 2) Самара, 3) Ростов, 4) Омск", a: ["2", "самара"], p: "Треугольники — холодный фронт." },
+        { id: 13, t: "Задание 13", q: "Температура на вершине (1500 м), если у подножия +20°С?", a: ["11"], p: "Минус 6 градусов на 1 км." },
+        { id: 18, t: "Задание 18", q: "Где 22 июня самый длинный световой день?<br>1) Сочи, 2) Тула, 3) Архангельск, 4) Воронеж", a: ["3", "архангельск"], p: "Летом на севере день длиннее." },
+        { id: 19, t: "Задание 19", q: "Расположите регионы встречи Нового года (с востока на запад):<br>1) Карелия, 2) Омская обл., 3) Забайкальский край", a: ["321"], p: "Восток празднует первым." },
+        { id: 22, t: "Задание 22", q: "В каком году в Белгородской области было больше всего прибывших?", a: ["2014"], p: "По таблице максимум в 2014." },
+        { id: 26, t: "Задание 26", q: "Два народа, исповедующих буддизм:<br>1) буряты, 2) татары, 3) калмыки, 4) чуваши, 5) чеченцы", a: ["13", "31"], p: "Буряты и Калмыки." }
+    ];
+
+    function startApp() {
+        const s = document.getElementById('start-screen');
+        const a = document.getElementById('app');
+        s.classList.add('hidden');
+        setTimeout(() => {
+            s.style.display = 'none';
+            a.style.display = 'block';
+            setTimeout(() => a.style.opacity = '1', 50);
+        }, 1000);
+    }
+
+    function render(data, target, isOge) {
+        const list = document.getElementById(target);
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.id = `card-${target}-${item.id}`;
+            card.innerHTML = `
+                <div class="tag">${isOge ? item.t : 'Вопрос №' + item.id}</div>
+                <div class="q-text">${item.q}</div>
+                <div class="input-box">
+                    <input type="text" placeholder="Ответ..." id="in-${target}-${item.id}">
+                    <button class="ok-btn" onclick="check('${target}', ${item.id})">OK</button>
+                </div>
+                <div class="result" id="res-${target}-${item.id}"></div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    window.check = (t, id) => {
+        const input = document.getElementById(`in-${t}-${id}`);
+        const box = document.getElementById(`res-${t}-${id}`);
+        const card = document.getElementById(`card-${t}-${id}`);const data = t === 'c-list' ? classicData : ogeData;
+        const item = data.find(x => x.id === id);
+        const val = input.value.toLowerCase().trim();
+
+        box.style.display = 'block';
+        card.classList.remove('shake');
+
+        if(item.a.some(ans => val.includes(ans)) && val !== "") {
+            box.className = 'result win';
+            box.innerHTML = `<strong>ВЕРНО!</strong><br><span class="expl">${item.p}</span>`;
+        } else {
+            void card.offsetWidth;
+            card.classList.add('shake');
+            box.className = 'result fail';
+            box.innerHTML = `<strong>ОШИБКА.</strong><br><span class="expl">Ответ: ${item.a[0]}. ${item.p}</span>`;
+        }
+    }
+
+    window.showTab = (m) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.list-section').forEach(s => s.classList.remove('active'));
+        if(m === 'c') {
+            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            document.getElementById('c-list').classList.add('active');
+        } else {
+            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            document.getElementById('o-list').classList.add('active');
+        }
+    }
+
+    render(classicData, 'c-list', false);
+    render(ogeData, 'o-list', true);
+</script>
+
+</body>
+</html>
